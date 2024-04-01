@@ -131,6 +131,15 @@ export async function POST(request: Request) {
     requestBody.preselectedPlayers || {}
   ).flat();
 
+  const completeTeam = getBuiltTeam(weights, preselectedPlayersTrimmed);
+
+  return NextResponse.json({ team: completeTeam });
+}
+
+export const getBuiltTeam = async (
+  weights: any,
+  preselectedPlayersTrimmed: any
+) => {
   //get full player details
   const players = (await sql`SELECT * FROM players;`).rows;
   console.log(`Fetched ${players.length} players data`);
@@ -295,5 +304,5 @@ export async function POST(request: Request) {
 
   console.log(`Final team (Details):`, completeTeam);
 
-  return NextResponse.json({ team: completeTeam });
-}
+  return completeTeam;
+};

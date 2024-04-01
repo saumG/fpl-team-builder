@@ -87,6 +87,16 @@ export default function PlayerSection() {
   const [playerData, setPlayerData] = useState([]);
 
   useEffect(() => {
+    const controller = new AbortController();
+
+    fetch("", {
+      signal: controller.signal,
+    })
+      .then((res) => res.json())
+      .then((data) => setPlayerData(data.players));
+
+    return () => controller.abort();
+
     // const fetchPlayers = async () => {
     //   try {
     //     const response = await ("http://localhost:5432/api/players");
