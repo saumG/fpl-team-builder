@@ -15,13 +15,19 @@ interface PlayerObj {
 }
 
 function matchPreselectedPlayers(fullPlayers: any, preselected: any): any {
-  const fullPlayerDetails = preselected.map((player: any) =>
-    fullPlayers.find((fullPlayer: any) => fullPlayer.id === player.id)
-  );
+  const fullPlayerDetails = preselected
+    .map((player: any) => {
+      // Explicitly return the result of the find operation
+      return player
+        ? fullPlayers.find((fullPlayer: any) => fullPlayer.id === player.id)
+        : undefined;
+    })
+    .filter((player: any) => player !== undefined);
   return fullPlayerDetails;
 }
 
 function normalizePlayerStats(players: any, weights: any): any {
+  console.log(`weights given to normalize func: ${JSON.stringify(weights)}`);
   // Initialize min and max objects
   const mins: any = {};
   const maxes: any = {};
@@ -43,6 +49,21 @@ function normalizePlayerStats(players: any, weights: any): any {
       }
     });
   });
+
+  Object.keys(mins).forEach((stat: string) => {
+    if (mins[stat] === null) {
+      mins[stat] = 0;
+    }
+  });
+
+  Object.keys(maxes).forEach((stat: string) => {
+    if (maxes[stat] === null) {
+      maxes[stat] = 0;
+    }
+  });
+
+  console.log(`the mins object : ${JSON.stringify(mins)}`);
+  console.log(`the maxes object : ${JSON.stringify(maxes)}`);
 
   // Normalize player stats
   const normalizedPlayers = players.map((player: any) => {
@@ -125,13 +146,15 @@ export async function POST(request: Request) {
   console.log(`Request body is ${JSON.stringify(requestBody)}`);
 
   //extract params. request.body.weights and request.body.preselectedPlayers (trimmed)
-  const weights = requestBody.weight || [];
+  const weights = requestBody.weights || [];
   // Flatten preselectedPlayers from the structured object into a single array
   const preselectedPlayersTrimmed = Object.values(
     requestBody.preselectedPlayers || {}
-  ).flat();
+  )
+    .flat()
+    .filter((player) => player !== null);
 
-  const completeTeam = getBuiltTeam(weights, preselectedPlayersTrimmed);
+  const completeTeam = await getBuiltTeam(weights, preselectedPlayersTrimmed);
 
   return NextResponse.json({ team: completeTeam });
 }
@@ -144,10 +167,6 @@ export const getBuiltTeam = async (
   const players = (await sql`SELECT * FROM players;`).rows;
   console.log(`Fetched ${players.length} players data`);
 
-  console.log(
-    `preselectedPlayersTrimmed type: ${typeof preselectedPlayersTrimmed}`,
-    preselectedPlayersTrimmed
-  );
   //find full details for preselected players (find trimmed player id in full player details object)
   const preselectedPlayersFull = matchPreselectedPlayers(
     players,
@@ -282,15 +301,20 @@ export const getBuiltTeam = async (
   ]);
   console.log(completeTeamIds);
 
-  // Create the complete team details
-  const completeTeam: any = {};
+  // Create the complete team object structure
+  const completeTeam: any = {
+    GKP: [],
+    DEF: [],
+    MID: [],
+    FWD: [],
+  };
   completeTeamIds.forEach((id) => {
     // Find this player in the scoredPlayers array
     const player =
       scoredPlayers.find((p: any) => p.id.toString() === id) ||
       preselectedPlayersFull.find((p: any) => p.id.toString() === id);
     if (player) {
-      completeTeam[player.id] = {
+      const playerObj = {
         first_name: player.first_name,
         second_name: player.second_name,
         id: player.id,
@@ -298,7 +322,11 @@ export const getBuiltTeam = async (
         total_rank: player.total_rank,
         position_rank: player.position_rank,
         cost: player.now_cost,
+        position: player.singular_name_short,
       };
+
+      // Push player object to corresponding position array
+      completeTeam[player.singular_name_short].push(playerObj);
     }
   });
 

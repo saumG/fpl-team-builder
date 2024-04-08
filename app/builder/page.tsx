@@ -1,9 +1,14 @@
 "use client";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 interface StatOption {
   name: string;
   selected: boolean;
+}
+
+interface MaxPosition {
+  [key: string]: number;
 }
 
 type StatsOptionsType = {
@@ -15,6 +20,14 @@ interface stat {
   stat: string;
   weight: number;
   percentage: number;
+}
+
+interface Player {
+  [key: string]: any;
+}
+
+interface Team {
+  [key: string]: Player[];
 }
 
 export default function PlayerSection() {
@@ -72,18 +85,21 @@ export default function PlayerSection() {
     },
   ];
 
+  const maxPosition: MaxPosition = { GKP: 2, DEF: 5, MID: 5, FWD: 3 };
+
   const [allPlayers, setAllPlayers] = useState([]); // Assuming you fetch this data
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredPlayers, setFilteredPlayers] = useState([]);
   const [statsOptions, setStatsOptions] =
     useState<StatsOptionsType>(initialStatsOptions);
   const [stats, setStats] = useState(initialStat);
-  const [team, setTeam] = useState({
-    GKP: Array(2).fill(null), // Initialize with empty slots
-    DEF: Array(5).fill(null),
-    MID: Array(5).fill(null),
-    FWD: Array(3).fill(null),
+  const [team, setTeam] = useState<Team>({
+    GKP: [],
+    DEF: [],
+    MID: [],
+    FWD: [],
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const addStat = () => {
     setStats([
@@ -153,89 +169,114 @@ export default function PlayerSection() {
     if (value) {
       const newFilteredPlayers = allPlayers.filter((player: any) => {
         const playerName = `${player.first_name.toLowerCase()} ${player.second_name.toLowerCase()}`;
-        return playerName.includes(value) && !isPlayerInTeam(player);
+        return playerName.includes(value) && !isPlayerInTeam(player, team);
       });
       setFilteredPlayers(newFilteredPlayers);
     } else {
       // When there's no search term, don't show already selected players
       setFilteredPlayers(
-        allPlayers.filter((player) => !isPlayerInTeam(player))
+        allPlayers.filter((player: any) => !isPlayerInTeam(player, team))
       );
     }
   };
 
-  const isPlayerInTeam = (player: any) => {
-    return Object.values(team).some((position) =>
-      position.some((teamPlayer) => teamPlayer && teamPlayer.id === player.id)
+  function isPlayerInTeam(player: any, team: any) {
+    return team[player.position].some(
+      (teamPlayer: any) => teamPlayer.id === player.id
     );
-  };
+  }
 
-  const addToTeam = (player: any) => {
-    setTeam((prevTeam) => {
-      // Creating a deep copy of the team object to ensure immutability
-      const newTeam = JSON.parse(JSON.stringify(prevTeam));
-      console.log("deep copy of newTeam" + JSON.stringify(newTeam));
-
-      // Find the correct position array to update
-      if (newTeam[player.position]) {
-        const index = newTeam[player.position].findIndex(
-          (p: any) => p === null
-        );
-        if (index !== -1) {
-          // Check if there is an empty spot
-          newTeam[player.position][index] = { ...player }; // Spread to ensure a new object
-          return newTeam; // Return the updated team
-        }
+  const addToTeam = (newPlayer: any) => {
+    setTeam((prevTeam: any) => {
+      if (isPlayerInTeam(newPlayer, prevTeam)) {
+        return prevTeam; // Player is already in the team, return early
       }
-      return prevTeam; // Return the previous state if no update is needed
+
+      const playerPosition = newPlayer.position;
+      if (prevTeam[playerPosition].length < maxPosition[playerPosition]) {
+        const updatedTeam = {
+          ...prevTeam,
+          [playerPosition]: [...prevTeam[playerPosition], newPlayer],
+        };
+        return updatedTeam;
+      }
+
+      return prevTeam; // Return previous state if no changes
     });
   };
 
-  const removeFromTeam = (player: any, position: any) => {
-    setTeam((prevTeam) => {
-      const newTeam = JSON.parse(JSON.stringify(prevTeam));
-      const playerIndex = newTeam[position].findIndex(
-        (p: any) => p && p.id === player.id
+  const removeFromTeam = (player: any) => {
+    setTeam((prevTeam: any) => {
+      const playerPosition = player.position;
+      console.log(
+        `trying to remove ${player.position} from ${JSON.stringify(prevTeam)}`
+      );
+      const playerIndex = prevTeam[playerPosition].findIndex(
+        (teamPlayer: any) => teamPlayer && teamPlayer.id === player.id
       );
 
       if (playerIndex !== -1) {
-        newTeam[position][playerIndex] = null; // Remove player from team
-        return newTeam;
+        // Use slice to avoid mutating the original array, then filter out the player
+        const updatedPositionArray = prevTeam[playerPosition]
+          .slice(0) // Creates a shallow copy of the array
+          .filter((_: any, index: number) => index !== playerIndex); // Remove the player
+
+        return {
+          ...prevTeam,
+          [playerPosition]: updatedPositionArray,
+        };
       }
-      return prevTeam;
+
+      return prevTeam; // Return the original state if no player was removed
     });
   };
 
   const calculateBestTeam = async () => {
+    setIsLoading(true); // Start loading
+    const controller = new AbortController();
+
     const requestBody = {
       weights: stats,
-      preselectedPlayers: team, // Replace this with actual IDs from your state
+      preselectedPlayers: team,
     };
 
-    // try {
-    //   const response = await axios.post(
-    //     "http://localhost:5432/api/builder",
-    //     requestBody
-    //   );
-    //   console.log("Team built successfully:", response.data);
-    // } catch (error) {
-    //   console.error(
-    //     "Error building team:",
-    //     error.response ? error.response.data : error.message
-    //   );
-    // }
+    try {
+      const response = await fetch("http://localhost:3000/api/builder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status})`);
+      }
+
+      const builtTeam = await response.json();
+
+      setTeam(builtTeam.team);
+    } catch (error) {
+      console.error("Failed to calculate best team:", error);
+    } finally {
+      setIsLoading(false); // End loading
+      controller.abort();
+    }
   };
 
   const fetchPlayers = async () => {
-    // try {
-    //   const response = await axios.get(
-    //     "http://localhost:5432/api/players/trimmed"
-    //   );
-    //   setAllPlayers(response.data);
-    //   console.log("fetched trimmed players");
-    // } catch (error) {
-    //   console.error("Error fetching trimmed player data:", error);
-    // }
+    const controller = new AbortController();
+
+    fetch("http://localhost:3000/api/trimmedPlayers", {
+      signal: controller.signal,
+    })
+      .then((response) => response.json())
+      .then((players) => {
+        setAllPlayers(players);
+      });
+
+    return () => controller.abort();
   };
 
   useEffect(() => {
@@ -368,46 +409,93 @@ export default function PlayerSection() {
             ))}
           </div>
         </div>
-        <div className="team-tables">
-          {Object.entries(team).map(([position, players]) => (
-            <div key={position} className="team-table mb-4">
-              <h3 className="text-lg font-bold text-center">{position}</h3>
-              <table className="table-auto w-full">
-                <thead>
-                  <tr className="bg-gray-200">
-                    <th className="px-4 py-2">Player Name</th>
-                    <th className="px-4 py-2">Position Rank</th>
-                    <th className="px-4 py-2">Total Rank</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {players.map((player, index) => (
-                    <tr key={index} className={player ? "bg-green-100" : ""}>
-                      <td className="border px-4 py-2 text-center">
-                        {player
-                          ? `${player.first_name} ${player.second_name}`
-                          : ""}
-                      </td>
-                      <td className="border px-4 py-2 text-center">...</td>{" "}
-                      {/* Your other cells */}
-                      <td className="border px-4 py-2 text-center">
-                        {player && (
-                          <button
-                            onClick={() => removeFromTeam(player, position)}
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                          >
-                            Remove
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
+        <div className="relative h-[600px] w-[500px] border-2 border-blue-700">
+          <Image
+            src="/Football_field.png"
+            alt="Football Field did not load"
+            objectFit="fill"
+            layout="fill"
+            priority
+          />
+          <div className="p-6 absolute top-0 left-0 right-0 bottom-0 flex flex-col justify-between">
+            {["FWD", "MID", "DEF", "GKP"].map((position: string) => (
+              <div
+                key={position}
+                className="flex justify-around items-center h-full align-middle "
+              >
+                {team[position].map((player: any, index: number) => (
+                  <div
+                    className="player-card relative p-1 border-1 flex flex-col w-24 h-24 align-middle justify-between text-center"
+                    key={index}
+                  >
+                    <button
+                      className="absolute top-0 right-0 text-xs bg-transparent p-1 text-red-500 border-2 rounded-full border-red-500 bg-red-500"
+                      onClick={() => removeFromTeam(player)}
+                    >
+                      X
+                    </button>
+                    <div className="flex flex-col items-center text-[12px] basis-5/12 my-4">
+                      <div>{player.first_name}</div>
+                      <div> {player.second_name}</div>
+                    </div>
+                    <div
+                      className="text-[10px] basis-1/6 flex items-center
+                     justify-around"
+                    >
+                      <div>TR: {player.total_rank ?? "N/A"}</div>
+                      <div>PR: {player.position_rank ?? "N/A"}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
+// <div className="team-tables">
+//           {Object.entries(team).map(([position, players], index) => (
+//             <div key={position} className="team-table mb-4">
+//               <h3 className="text-lg font-bold text-center">{position}</h3>
+//               <table className="table-auto w-full">
+//                 <thead>
+//                   <tr className="bg-gray-200">
+//                     <th className="px-4 py-2">Player Name</th>
+//                     <th className="px-4 py-2">Position Rank</th>
+//                     <th className="px-4 py-2">Total Rank</th>
+//                   </tr>
+//                 </thead>
+//                 <tbody>
+//                   {isLoading ? (
+//                     <div>Loading team...</div>
+//                   ) : (
+//                     players.map((player: any, index) => (
+//                       <tr key={index} className={player ? "bg-green-100" : ""}>
+//                         <td className="border px-4 py-2 text-center">
+//                           {player
+//                             ? `${player.first_name} ${player.second_name}`
+//                             : ""}
+//                         </td>
+//                         <td className="border px-4 py-2 text-center">...</td>{" "}
+//                         {/* Your other cells */}
+//                         <td className="border px-4 py-2 text-center">
+//                           {player && (
+//                             <button
+//                               onClick={() => removeFromTeam(player)}
+//                               className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+//                             >
+//                               Remove
+//                             </button>
+//                           )}
+//                         </td>
+//                       </tr>
+//                     ))
+//                   )}
+//                 </tbody>
+//               </table>
+//             </div>
+//           ))}
+//         </div>

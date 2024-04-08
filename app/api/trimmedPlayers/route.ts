@@ -16,7 +16,7 @@ interface Player {
 }
 
 export async function GET(request: Request) {
-  const trimmedPlayers = getTrimmedPlayers();
+  const trimmedPlayers = await getTrimmedPlayers();
   return NextResponse.json(trimmedPlayers);
 }
 
