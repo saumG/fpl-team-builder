@@ -421,27 +421,27 @@ export default function PlayerSection() {
             {["FWD", "MID", "DEF", "GKP"].map((position: string) => (
               <div
                 key={position}
-                className="flex justify-around items-center h-full align-middle "
+                className="flex justify-around items-center h-full align-middle gap-3"
               >
                 {team[position].map((player: any, index: number) => (
                   <div
-                    className="player-card relative p-1 border-1 flex flex-col w-24 h-24 align-middle justify-between text-center"
+                    className="player-card relative border-1 flex flex-col w-24 h-20 align-middle justify-between text-center"
                     key={index}
                   >
-                    <button
-                      className="absolute top-0 right-0 text-xs bg-transparent p-1 text-red-500 border-2 rounded-full border-red-500 bg-red-500"
-                      onClick={() => removeFromTeam(player)}
-                    >
-                      X
-                    </button>
-                    <div className="flex flex-col items-center text-[12px] basis-5/12 my-4">
+                    <div className="flex justify-between ">
+                      <div></div>
+                      <button
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-full text-[8px]"
+                        onClick={() => removeFromTeam(player)}
+                      >
+                        X
+                      </button>
+                    </div>
+                    <div className="flex flex-col items-center text-[10px] basis-5/12 bg-blue-600 rounded-2xl text-white py-2">
                       <div>{player.first_name}</div>
                       <div> {player.second_name}</div>
                     </div>
-                    <div
-                      className="text-[10px] basis-1/6 flex items-center
-                     justify-around"
-                    >
+                    <div className="text-[10px] basis-1/6 flex items-center justify-around bg-blue-300 rounded-2xl ">
                       <div>TR: {player.total_rank ?? "N/A"}</div>
                       <div>PR: {player.position_rank ?? "N/A"}</div>
                     </div>
