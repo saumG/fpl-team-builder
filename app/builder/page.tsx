@@ -30,7 +30,7 @@ interface Team {
   [key: string]: Player[];
 }
 
-export default function PlayerSection() {
+export default function BuilderSection() {
   const initialStatsOptions: StatsOptionsType = {
     chance_of_playing_next_round: {
       name: "Next Round Play Chance",
@@ -88,8 +88,6 @@ export default function PlayerSection() {
   const maxPosition: MaxPosition = { GKP: 2, DEF: 5, MID: 5, FWD: 3 };
 
   const [allPlayers, setAllPlayers] = useState([]); // Assuming you fetch this data
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredPlayers, setFilteredPlayers] = useState([]);
   const [statsOptions, setStatsOptions] =
     useState<StatsOptionsType>(initialStatsOptions);
   const [stats, setStats] = useState(initialStat);
@@ -100,6 +98,9 @@ export default function PlayerSection() {
     FWD: [],
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [filteredData, setFilteredData] = useState([]);
+  const [wordEntry, setWordEntry] = useState("");
+  const [isInputFocused, setIsInputFocused] = useState<boolean>(false);
 
   const addStat = () => {
     setStats([
@@ -163,23 +164,6 @@ export default function PlayerSection() {
     }));
   };
 
-  const handleSearch = (e: any) => {
-    const value = e.target.value.trim().toLowerCase();
-    setSearchTerm(value);
-    if (value) {
-      const newFilteredPlayers = allPlayers.filter((player: any) => {
-        const playerName = `${player.first_name.toLowerCase()} ${player.second_name.toLowerCase()}`;
-        return playerName.includes(value) && !isPlayerInTeam(player, team);
-      });
-      setFilteredPlayers(newFilteredPlayers);
-    } else {
-      // When there's no search term, don't show already selected players
-      setFilteredPlayers(
-        allPlayers.filter((player: any) => !isPlayerInTeam(player, team))
-      );
-    }
-  };
-
   function isPlayerInTeam(player: any, team: any) {
     return team[player.position].some(
       (teamPlayer: any) => teamPlayer.id === player.id
@@ -187,6 +171,7 @@ export default function PlayerSection() {
   }
 
   const addToTeam = (newPlayer: any) => {
+    console.log(JSON.stringify(newPlayer));
     setTeam((prevTeam: any) => {
       if (isPlayerInTeam(newPlayer, prevTeam)) {
         return prevTeam; // Player is already in the team, return early
@@ -209,7 +194,7 @@ export default function PlayerSection() {
     setTeam((prevTeam: any) => {
       const playerPosition = player.position;
       console.log(
-        `trying to remove ${player.position} from ${JSON.stringify(prevTeam)}`
+        `trying to remove ${player.first_name} ${player.position} from team`
       );
       const playerIndex = prevTeam[playerPosition].findIndex(
         (teamPlayer: any) => teamPlayer && teamPlayer.id === player.id
@@ -274,6 +259,7 @@ export default function PlayerSection() {
       .then((response) => response.json())
       .then((players) => {
         setAllPlayers(players);
+        console.log(`type of players is ${typeof players}`);
       });
 
     return () => controller.abort();
@@ -309,8 +295,32 @@ export default function PlayerSection() {
     fetchPlayers();
   }, []);
 
+  const handleFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const searchWord = event.target.value.toLowerCase();
+    setWordEntry(searchWord);
+    const newFilter = allPlayers.filter((value: any) => {
+      const fullName = (
+        value.first_name +
+        " " +
+        value.second_name
+      ).toLowerCase();
+      return fullName.includes(searchWord);
+    });
+
+    if (searchWord === "") {
+      setFilteredData([]);
+    } else {
+      setFilteredData(newFilter);
+    }
+  };
+
+  const clearInput = () => {
+    setFilteredData([]);
+    setWordEntry("");
+  };
+
   return (
-    <div className="flex">
+    <div className="flex justify-center">
       <div className="stat-section p-5">
         <div className="add-stat-btn mb-4">
           <button
@@ -333,7 +343,7 @@ export default function PlayerSection() {
                 <th className="px-1 py-2">Stat</th>
                 <th className="px-1 py-2">Weight</th>
                 <th className="px-2 py-2">Percentage</th>
-                <th className="px-2 py-2">Actions</th>
+                <th className="px-2 py-2"></th>
               </tr>
             </thead>
             <tbody>
@@ -361,24 +371,26 @@ export default function PlayerSection() {
                       )}
                     </select>
                   </td>
-                  <td className="border px-4 py-2">
+                  <td className="border px-4 py-2 ">
                     <input
                       type="number"
-                      className="p-2 border rounded"
+                      className="p-2 border rounded w-20 flex justify-center items-center"
                       value={stat.weight}
                       onChange={(e: any) =>
                         updateWeight(stat.id, e.target.value)
                       }
                     />
                   </td>
-                  <td className="border px-4 py-2">{stat.percentage}%</td>
+                  <td className="border px-4 py-2 text-center">
+                    {stat.percentage}%
+                  </td>
                   <td className="border px-4 py-2">
-                    <button
+                    <img
+                      className="h-5 cursor-pointer"
+                      src="/close-button.svg"
+                      alt=""
                       onClick={() => removeStat(stat.id)}
-                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-full"
-                    >
-                      X
-                    </button>
+                    />
                   </td>
                 </tr>
               ))}
@@ -386,30 +398,58 @@ export default function PlayerSection() {
           </table>
         </div>
       </div>
-      <div className="built-team-section p-5">
-        <div className="player-search mb-4">
-          <input
-            type="text"
-            className="p-2 border rounded"
-            placeholder="Search players..."
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-          <div className="search-results">
-            {filteredPlayers.map((player: any) => (
-              <div key={player.id} className="search-result-item">
-                {player.first_name} {player.second_name}
-                <button
-                  className="ml-2 bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded"
-                  onClick={() => addToTeam(player)}
-                >
-                  Add
-                </button>
+      <div className="built-team-section p-5 flex flex-col gap-4">
+        <div className="search-bar flex justify-center ">
+          <div className="search">
+            <div className="search-inputs flex border-2 justify-between rounded border-slate-300">
+              <input
+                className="bg-white rounded text-base p-2 h-6 w-96 border-none"
+                type="text"
+                placeholder="Enter a player's name..."
+                onChange={handleFilter}
+                value={wordEntry}
+                onFocus={() => setIsInputFocused(true)}
+                onBlur={() => {
+                  setIsInputFocused(false);
+                }}
+              ></input>
+              <div className="search-icon h-6 w-12 bg-white grid place-items-center focus:outline-none">
+                {filteredData.length == 0 ? (
+                  <img className="h-5" src="/search-52.svg" alt="" />
+                ) : (
+                  <img
+                    className="h-5 cursor-pointer"
+                    src="/icons8-close.svg"
+                    alt=""
+                    onClick={clearInput}
+                  />
+                )}
               </div>
-            ))}
+            </div>
+            {isInputFocused && filteredData.length != 0 && (
+              <div className="search-result mt-[5px] w-96 max-h-60  bg-white shadow-[rgba(0,0,0,0.35) 0px 5px 15px] overflow-hidden overflow-y-auto no-scrollbar z-50 border-2 border-slate-400">
+                {filteredData.slice(0, 15).map((player: any, key: any) => {
+                  return (
+                    <div
+                      className="flex justify-between w-96  hover:bg-gray-200 px-2 py-2"
+                      key={key}
+                    >
+                      <div className="data-item player flex items-center text-black ml-2">
+                        {player.first_name + " " + player.second_name}
+                      </div>
+                      <img
+                        className="h-8 cursor-pointer"
+                        src="/icons8-plus.svg"
+                        alt=""
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
-        <div className="relative h-[600px] w-[500px] border-2 border-blue-700">
+        <div className="football-pitch relative h-[600px] w-[500px] border-2 border-blue-700">
           <Image
             src="/Football_field.png"
             alt="Football Field did not load"
@@ -425,11 +465,10 @@ export default function PlayerSection() {
               >
                 {team[position].map((player: any, index: number) => (
                   <div
-                    className="player-card relative border-1 flex flex-col w-24 h-20 align-middle justify-between text-center"
+                    className="player-card relative border-1 flex flex-col w-[85px] h-[80px] align-middle justify-between text-center"
                     key={index}
                   >
-                    <div className="flex justify-between ">
-                      <div></div>
+                    <div className="absolute top-[-12px] right-[-8px] ">
                       <button
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-full text-[8px]"
                         onClick={() => removeFromTeam(player)}
@@ -437,7 +476,7 @@ export default function PlayerSection() {
                         X
                       </button>
                     </div>
-                    <div className="flex flex-col items-center text-[10px] basis-5/12 bg-blue-600 rounded-2xl text-white py-2">
+                    <div className="flex flex-col items-center justify-center text-[10px] basis-5/6 bg-blue-600 rounded-2xl text-white py-2">
                       <div>{player.first_name}</div>
                       <div> {player.second_name}</div>
                     </div>
