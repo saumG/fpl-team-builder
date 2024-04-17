@@ -1,4 +1,5 @@
 "use client";
+import Alert from "@mui/material/Alert";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
@@ -101,12 +102,21 @@ export default function BuilderSection() {
   const [filteredData, setFilteredData] = useState([]);
   const [wordEntry, setWordEntry] = useState("");
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alert, setAlert] = useState(false);
 
   const addStat = () => {
-    setStats([
-      ...stats,
-      { id: stats.length + 1, stat: "", weight: 1, percentage: 0 },
-    ]);
+    if (stats.length < 10) {
+      setStats([
+        ...stats,
+        { id: stats.length + 1, stat: "", weight: 1, percentage: 0 },
+      ]);
+    } else {
+      setAlertMessage(
+        "You cannot add more than 10 stats for building your team."
+      );
+      setAlert(true);
+    }
   };
 
   const removeStat = (id: number) => {
@@ -184,6 +194,11 @@ export default function BuilderSection() {
           [playerPosition]: [...prevTeam[playerPosition], newPlayer],
         };
         return updatedTeam;
+      } else {
+        setAlertMessage(
+          `You already have the maximum of ${maxPosition[playerPosition]} ${playerPosition}s. Please remove one before adding more.`
+        );
+        setAlert(true);
       }
 
       return prevTeam; // Return previous state if no changes
@@ -295,6 +310,19 @@ export default function BuilderSection() {
     fetchPlayers();
   }, []);
 
+  const clearTeam = () => {
+    setTeam({
+      GKP: [],
+      DEF: [],
+      MID: [],
+      FWD: [],
+    });
+  };
+
+  const resetStats = () => {
+    setStats(initialStat);
+  };
+
   const handleFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchWord = event.target.value.toLowerCase();
     setWordEntry(searchWord);
@@ -320,177 +348,241 @@ export default function BuilderSection() {
   };
 
   return (
-    <div className="flex justify-center">
-      <div className="stat-section p-5">
-        <div className="add-stat-btn mb-4">
-          <button
-            onClick={addStat}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Add Stat
-          </button>
-          <button
-            onClick={calculateBestTeam}
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Calculate Best Team
-          </button>
-        </div>
-        <div className="stat-table overflow-x-auto">
-          <table className="table-auto">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="px-1 py-2">Stat</th>
-                <th className="px-1 py-2">Weight</th>
-                <th className="px-2 py-2">Percentage</th>
-                <th className="px-2 py-2"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.map((stat) => (
-                <tr key={stat.id}>
-                  <td className="border px-4 py-2">
-                    <select
-                      className="p-2 border rounded"
-                      value={stat.stat}
-                      onChange={(e: any) => updateStat(stat.id, e.target.value)}
-                    >
-                      {stat.stat ? (
-                        <option value={stat.stat}>
-                          {statsOptions[stat.stat]?.name}
-                        </option>
-                      ) : (
-                        <option value="">Select a stat</option>
-                      )}
-                      {Object.entries(statsOptions).map(([key, option]) =>
-                        !option.selected ? (
-                          <option key={key} value={key}>
-                            {option.name}
+    <div>
+      <div className="flex justify-center">
+        <div className="stat-section p-5 flex flex-col ">
+          <div className="flex justify-center p-3 text-lg text-slate-950">
+            Stats Table
+          </div>
+          <div className="stat-table overflow-x-auto">
+            <table className="table-auto rounded-xl">
+              <thead>
+                <tr className="bg-blue-500">
+                  <th className="px-1 py-1">Stat</th>
+                  <th className="px-1 py-1">Weight</th>
+                  <th className="px-2 py-1">Percentage</th>
+                  <th className="px-2 py-1"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.map((stat) => (
+                  <tr key={stat.id}>
+                    <td className="px-4 py-1">
+                      <select
+                        className="p-2 border rounded"
+                        value={stat.stat}
+                        onChange={(e: any) =>
+                          updateStat(stat.id, e.target.value)
+                        }
+                      >
+                        {stat.stat ? (
+                          <option value={stat.stat}>
+                            {statsOptions[stat.stat]?.name}
                           </option>
-                        ) : null
-                      )}
-                    </select>
-                  </td>
-                  <td className="border px-4 py-2 ">
-                    <input
-                      type="number"
-                      className="p-2 border rounded w-20 flex justify-center items-center"
-                      value={stat.weight}
-                      onChange={(e: any) =>
-                        updateWeight(stat.id, e.target.value)
-                      }
-                    />
-                  </td>
-                  <td className="border px-4 py-2 text-center">
-                    {stat.percentage}%
-                  </td>
-                  <td className="border px-4 py-2">
+                        ) : (
+                          <option value="">Select a stat</option>
+                        )}
+                        {Object.entries(statsOptions).map(([key, option]) =>
+                          !option.selected ? (
+                            <option key={key} value={key}>
+                              {option.name}
+                            </option>
+                          ) : null
+                        )}
+                      </select>
+                    </td>
+                    <td className="px-4 py-1 ">
+                      <input
+                        type="number"
+                        className="p-2 border rounded w-20 flex justify-center items-center"
+                        value={stat.weight}
+                        onChange={(e: any) =>
+                          updateWeight(stat.id, e.target.value)
+                        }
+                      />
+                    </td>
+                    <td className="px-4 py-1 text-center">
+                      {stat.percentage}%
+                    </td>
+                    <td className="px-4 py-1">
+                      <img
+                        className="h-5 cursor-pointer"
+                        src="/close-button.svg"
+                        alt=""
+                        onClick={() => removeStat(stat.id)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="add-stat-btn flex justify-start py-4 gap-4">
+            <button
+              onClick={addStat}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl"
+            >
+              Add Stat
+            </button>
+            <button
+              onClick={resetStats}
+              className="bg-red-400 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-2xl"
+            >
+              Reset Stats
+            </button>
+          </div>
+        </div>
+        <div className="built-team-section p-5 flex flex-col gap-4 justify-center items-center">
+          <div className="search-bar flex justify-center ">
+            <div className="search">
+              <div className="search-inputs flex border-2 justify-between rounded border-slate-300">
+                <input
+                  className="bg-white rounded text-base p-2 h-6 w-96 border-none"
+                  type="text"
+                  placeholder="Enter a player's name..."
+                  onChange={handleFilter}
+                  value={wordEntry}
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={() => {
+                    setTimeout(() => setIsInputFocused(false), 250); // delays state update
+                  }}
+                ></input>
+                <div className="search-icon h-6 w-12 bg-white grid place-items-center focus:outline-none">
+                  {filteredData.length == 0 ? (
+                    <img className="h-5" src="/search-52.svg" alt="" />
+                  ) : (
                     <img
                       className="h-5 cursor-pointer"
-                      src="/close-button.svg"
+                      src="/icons8-close.svg"
                       alt=""
-                      onClick={() => removeStat(stat.id)}
+                      onClick={clearInput}
                     />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div className="built-team-section p-5 flex flex-col gap-4">
-        <div className="search-bar flex justify-center ">
-          <div className="search">
-            <div className="search-inputs flex border-2 justify-between rounded border-slate-300">
-              <input
-                className="bg-white rounded text-base p-2 h-6 w-96 border-none"
-                type="text"
-                placeholder="Enter a player's name..."
-                onChange={handleFilter}
-                value={wordEntry}
-                onFocus={() => setIsInputFocused(true)}
-                onBlur={() => {
-                  setIsInputFocused(false);
-                }}
-              ></input>
-              <div className="search-icon h-6 w-12 bg-white grid place-items-center focus:outline-none">
-                {filteredData.length == 0 ? (
-                  <img className="h-5" src="/search-52.svg" alt="" />
-                ) : (
-                  <img
-                    className="h-5 cursor-pointer"
-                    src="/icons8-close.svg"
-                    alt=""
-                    onClick={clearInput}
-                  />
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-            {isInputFocused && filteredData.length != 0 && (
-              <div className="search-result mt-[5px] w-96 max-h-60  bg-white shadow-[rgba(0,0,0,0.35) 0px 5px 15px] overflow-hidden overflow-y-auto no-scrollbar z-50 border-2 border-slate-400">
-                {filteredData.slice(0, 15).map((player: any, key: any) => {
-                  return (
-                    <div
-                      className="flex justify-between w-96  hover:bg-gray-200 px-2 py-2"
-                      key={key}
-                    >
-                      <div className="data-item player flex items-center text-black ml-2">
-                        {player.first_name + " " + player.second_name}
+              {isInputFocused && filteredData.length != 0 && (
+                <div className="search-result mt-[5px] w-96 max-h-60  bg-white shadow-[rgba(0,0,0,0.35) 0px 5px 15px] overflow-hidden overflow-y-auto no-scrollbar absolute z-50 border-2 border-slate-400">
+                  {filteredData.slice(0, 15).map((player: any) => {
+                    return (
+                      <div className="flex justify-between w-96  hover:bg-gray-200 px-2 py-2">
+                        <div className="data-item player flex items-center text-black ml-2">
+                          {player.first_name + " " + player.second_name}
+                        </div>
+                        <img
+                          className="h-8 cursor-pointer"
+                          src="/icons8-plus.svg"
+                          alt=""
+                          onClick={() => {
+                            addToTeam(player);
+                            clearInput();
+                          }}
+                        />
                       </div>
-                      <img
-                        className="h-8 cursor-pointer"
-                        src="/icons8-plus.svg"
-                        alt=""
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-        <div className="football-pitch relative h-[600px] w-[500px] border-2 border-blue-700">
-          <Image
-            src="/Football_field.png"
-            alt="Football Field did not load"
-            objectFit="fill"
-            layout="fill"
-            priority
-          />
-          <div className="p-6 absolute top-0 left-0 right-0 bottom-0 flex flex-col justify-between">
-            {["FWD", "MID", "DEF", "GKP"].map((position: string) => (
-              <div
-                key={position}
-                className="flex justify-around items-center h-full align-middle gap-3"
-              >
-                {team[position].map((player: any, index: number) => (
-                  <div
-                    className="player-card relative border-1 flex flex-col w-[85px] h-[80px] align-middle justify-between text-center"
-                    key={index}
+          <div className="football-pitch relative h-[550px] w-[450px]">
+            <Image
+              src="/Football_field.png"
+              alt="Football Field did not load"
+              objectFit="fill"
+              layout="fill"
+              priority
+            />
+            <div className="p-4 absolute top-0 left-0 right-0 bottom-0 flex flex-col justify-between">
+              {["FWD", "MID", "DEF", "GKP"].map((position: string) => (
+                <div
+                  key={position}
+                  className="flex justify-around items-center h-full align-middle gap-3"
+                >
+                  {team[position].map((player: any, index: number) => (
+                    <div
+                      className="player-card relative border-1 flex flex-col w-[85px] h-[80px] align-middle justify-between text-center"
+                      key={index}
+                    >
+                      <div className="absolute top-[-12px] right-[-8px] ">
+                        <button
+                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-full text-[8px]"
+                          onClick={() => removeFromTeam(player)}
+                        >
+                          X
+                        </button>
+                      </div>
+                      <div className="flex flex-col items-center justify-center text-[10px] basis-5/6 bg-blue-600 rounded-2xl text-white py-2">
+                        <div>{player.first_name}</div>
+                        <div> {player.second_name}</div>
+                      </div>
+                      <div className="text-[10px] basis-1/6 flex items-center justify-around bg-blue-300 rounded-2xl ">
+                        <div>TR: {player.total_rank ?? "N/A"}</div>
+                        <div>PR: {player.position_rank ?? "N/A"}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="team-buttons mb-4 flex gap-4">
+            <button
+              onClick={calculateBestTeam}
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-2xl w-64 flex justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
                   >
-                    <div className="absolute top-[-12px] right-[-8px] ">
-                      <button
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-full text-[8px]"
-                        onClick={() => removeFromTeam(player)}
-                      >
-                        X
-                      </button>
-                    </div>
-                    <div className="flex flex-col items-center justify-center text-[10px] basis-5/6 bg-blue-600 rounded-2xl text-white py-2">
-                      <div>{player.first_name}</div>
-                      <div> {player.second_name}</div>
-                    </div>
-                    <div className="text-[10px] basis-1/6 flex items-center justify-around bg-blue-300 rounded-2xl ">
-                      <div>TR: {player.total_rank ?? "N/A"}</div>
-                      <div>PR: {player.position_rank ?? "N/A"}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.86 1.861 7.298 4.708 9.291l1.292-1.292z"
+                    ></path>
+                  </svg>
+                  <span>Calculating...</span>
+                </>
+              ) : (
+                "Calculate Best Team"
+              )}
+            </button>
+            <button
+              onClick={clearTeam}
+              className="bg-red-400 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl"
+            >
+              Clear Team
+            </button>
           </div>
         </div>
       </div>
+      {alert ? (
+        <div className="fixed bottom-0 left-0 mb-4 ml-4 ">
+          <Alert
+            variant="filled"
+            severity="error"
+            onClose={() => {
+              setAlertMessage("");
+              setAlert(false);
+            }}
+          >
+            {alertMessage}
+          </Alert>
+        </div>
+      ) : (
+        <div></div>
+      )}
     </div>
   );
 }

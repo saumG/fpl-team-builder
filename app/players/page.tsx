@@ -10,67 +10,6 @@ import { FilterMatchMode } from "primereact/api";
 import { InputText } from "primereact/inputtext";
 
 export default function PlayerSection() {
-  const propertyNamesMapping: any = {
-    chance_of_playing_next_round: "Next Round Play Chance",
-    chance_of_playing_this_round: "This Round Play Chance",
-    code: "Code",
-    cost_change_event: "Cost Change Event",
-    cost_change_event_fall: "Cost Change Event Fall",
-    cost_change_start: "Cost Change Start",
-    cost_change_start_fall: "Cost Change Start Fall",
-    dreamteam_count: "Dreamteam Count",
-    element_type: "Position",
-    ep_next: "Expected Points Next",
-    ep_this: "Expected Points This",
-    event_points: "Event Points",
-    first_name: "First Name",
-    form: "Form",
-    id: "ID",
-    in_dreamteam: "In Dreamteam",
-    news: "News",
-    news_added: "News Added",
-    now_cost: "Cost",
-    photo: "Photo",
-    points_per_game: "Points Per Game",
-    second_name: "Second Name",
-    selected_by_percent: "Selected By %",
-    special: "Special",
-    squad_number: "Squad Number",
-    status: "Status",
-    team: "Team",
-    team_code: "Team Code",
-    total_points: "Total Points",
-    transfers_in: "Transfers In",
-    transfers_in_event: "Transfers In Event",
-    transfers_out: "Transfers Out",
-    transfers_out_event: "Transfers Out Event",
-    value_form: "Value Form",
-    value_season: "Value Season",
-    web_name: "Web Name",
-    minutes: "Minutes",
-    goals_scored: "Goals Scored",
-    assists: "Assists",
-    clean_sheets: "Clean Sheets",
-    goals_conceded: "Goals Conceded",
-    own_goals: "Own Goals",
-    penalties_saved: "Penalties Saved",
-    penalties_missed: "Penalties Missed",
-    yellow_cards: "Yellow Cards",
-    red_cards: "Red Cards",
-    saves: "Saves",
-    bonus: "Bonus",
-    bps: "BPS",
-    influence: "Influence",
-    creativity: "Creativity",
-    threat: "Threat",
-    ict_index: "ICT Index",
-    expected_goals: "xG",
-    expected_assists: "xA",
-    expected_goal_involvements: "xGI",
-    expected_goals_conceded: "xGA",
-    team_name: "Team Name",
-    singular_name_short: "Position",
-  };
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
@@ -110,9 +49,9 @@ export default function PlayerSection() {
         rows={10}
         rowsPerPageOptions={[10, 25, 50]}
       >
-        <Column sortable field="first_name" header="First Name"></Column>;
-        <Column sortable field="second_name" header="Second Name"></Column>;
-        <Column sortable field="team_name" header="Team"></Column>;
+        <Column sortable field="first_name" header="First Name"></Column>
+        <Column sortable field="second_name" header="Second Name"></Column>
+        <Column sortable field="team_name" header="Team"></Column>
         <Column sortable field="singular_name_short" header="Position"></Column>
         <Column sortable field="total_points" header="Total Points"></Column>
         <Column sortable field="now_cost" header="Cost"></Column>

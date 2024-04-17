@@ -11,6 +11,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/material": "^5.15.15",
     "@types/ms": "^0.7.32",
     "@types/node": "20.8.3",
     "@types/react": "18.2.25",
@@ -28,6 +31,7 @@
     "postcss": "8.4.31",
     "primereact": "^10.6.2",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.10.2",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "tailwindcss": "3.3.3",
