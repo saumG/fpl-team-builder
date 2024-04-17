@@ -405,7 +405,7 @@ export default function BuilderSection() {
                       {stat.percentage}%
                     </td>
                     <td className="px-4 py-1">
-                      <img
+                      <Image
                         className="h-5 cursor-pointer"
                         src="/close-button.svg"
                         alt=""
@@ -449,9 +449,9 @@ export default function BuilderSection() {
                 ></input>
                 <div className="search-icon h-6 w-12 bg-white grid place-items-center focus:outline-none">
                   {filteredData.length == 0 ? (
-                    <img className="h-5" src="/search-52.svg" alt="" />
+                    <Image className="h-5" src="/search-52.svg" alt="" />
                   ) : (
-                    <img
+                    <Image
                       className="h-5 cursor-pointer"
                       src="/icons8-close.svg"
                       alt=""
@@ -464,11 +464,14 @@ export default function BuilderSection() {
                 <div className="search-result mt-[5px] w-96 max-h-60  bg-white shadow-[rgba(0,0,0,0.35) 0px 5px 15px] overflow-hidden overflow-y-auto no-scrollbar absolute z-50 border-2 border-slate-400">
                   {filteredData.slice(0, 15).map((player: any) => {
                     return (
-                      <div className="flex justify-between w-96  hover:bg-gray-200 px-2 py-2">
+                      <div
+                        key={player.id}
+                        className="flex justify-between w-96  hover:bg-gray-200 px-2 py-2"
+                      >
                         <div className="data-item player flex items-center text-black ml-2">
                           {player.first_name + " " + player.second_name}
                         </div>
-                        <img
+                        <Image
                           className="h-8 cursor-pointer"
                           src="/icons8-plus.svg"
                           alt=""
