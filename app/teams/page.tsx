@@ -17,9 +17,8 @@ export default function TeamSection() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const apiUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
 
-    fetch(`${apiUrl}/api/teams`, {
+    fetch(`/api/teams`, {
       signal: controller.signal,
     })
       .then((response) => response.json()) // Call response.json()

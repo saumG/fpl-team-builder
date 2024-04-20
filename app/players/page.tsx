@@ -17,9 +17,8 @@ export default function PlayerSection() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const apiUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
 
-    fetch(`${apiUrl}/api/players`, {
+    fetch(`/api/players`, {
       signal: controller.signal,
     })
       .then((response) => response.json()) // Call response.json()
