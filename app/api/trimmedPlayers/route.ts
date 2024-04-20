@@ -31,7 +31,7 @@ function createTrimmedPlayersList(fullPlayersList: any) {
   );
 }
 
-export const getTrimmedPlayers = async () => {
+const getTrimmedPlayers = async () => {
   const players =
     await sql`SELECT id, first_name, second_name, singular_name_short FROM players`;
   const trimmedPlayers = createTrimmedPlayersList(players.rows);

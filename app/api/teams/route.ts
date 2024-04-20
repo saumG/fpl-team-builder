@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   return NextResponse.json(teams);
 }
 
-export const getTeam = async () => {
+const getTeam = async () => {
   const teams = await sql`SELECT * FROM teams;`;
   return teams.rows;
 };
