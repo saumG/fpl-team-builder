@@ -17,8 +17,9 @@ export default function PlayerSection() {
 
   useEffect(() => {
     const controller = new AbortController();
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-    fetch("http://localhost:3000/api/players", {
+    fetch(`${apiUrl}/api/players`, {
       signal: controller.signal,
     })
       .then((response) => response.json()) // Call response.json()
@@ -75,48 +76,3 @@ export default function PlayerSection() {
     </div>
   );
 }
-
-// <div className="p-5">
-//   <div className="flex mb-4">
-//     <input
-//       type="text"
-//       className="p-2 border rounded"
-//       placeholder="Search players..."
-//       onChange={(e) => setSearchTerm(e.target.value)}
-//     />
-//   </div>
-//   <div className="overflow-x-auto">
-//     <table className="table-auto w-full">
-//       <thead className="bg-gray-200">
-//         <tr>
-//           {orderedProperties.map((prop: string) => (
-//             <th key={prop} className="px-4 py-2">
-//               {propertyNamesMapping[prop]}
-//             </th>
-//           ))}
-//         </tr>
-//       </thead>
-//       <tbody>
-//         {playerData
-//           .filter(
-//             (player: any) =>
-//               player.first_name
-//                 .toLowerCase()
-//                 .includes(searchTerm.toLowerCase()) ||
-//               player.second_name
-//                 .toLowerCase()
-//                 .includes(searchTerm.toLowerCase())
-//           )
-//           .map((player: any) => (
-//             <tr key={player.id}>
-//               {orderedProperties.map((prop: string) => (
-//                 <td key={prop} className="border px-4 py-2">
-//                   {player[prop]}
-//                 </td>
-//               ))}
-//             </tr>
-//           ))}
-//       </tbody>
-//     </table>
-//   </div>
-// </div>

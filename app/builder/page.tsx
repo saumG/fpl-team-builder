@@ -240,8 +240,10 @@ export default function BuilderSection() {
       preselectedPlayers: team,
     };
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
     try {
-      const response = await fetch("http://localhost:3000/api/builder", {
+      const response = await fetch(`${apiUrl}/api/builder`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -267,8 +269,9 @@ export default function BuilderSection() {
 
   const fetchPlayers = async () => {
     const controller = new AbortController();
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-    fetch("http://localhost:3000/api/trimmedPlayers", {
+    fetch(`${apiUrl}/api/trimmedPlayers`, {
       signal: controller.signal,
     })
       .then((response) => response.json())
