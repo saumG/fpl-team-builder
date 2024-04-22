@@ -1,20 +1,61 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
+  const pathname = usePathname();
+
   return (
-    <nav className="bg-gray-800 p-3 text-white flex align-middle justify-center gap-6">
-      <Link href="/" className="px-3 py-2 rounded-md text-sm font-medium">
-        Home
-      </Link>
-      <Link href="players" className="px-3 py-2 rounded-md text-sm font-medium">
-        Players
-      </Link>
-      <Link href="teams" className="px-3 py-2 rounded-md text-sm font-medium">
-        Teams
-      </Link>
-      <Link href="builder" className="px-3 py-2 rounded-md text-sm font-medium">
-        Team Builder
-      </Link>
-    </nav>
+    <ul className="p-2 flex flex-wrap justify-center text-sm font-medium text-center text-gray-500 border-b border-gray-200">
+      <li className="mr-2">
+        <Link
+          href="/"
+          className={`inline-block py-2 px-4 rounded-t-lg ${
+            pathname === "/"
+              ? "text-white bg-blue-500"
+              : "hover:text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          Home
+        </Link>
+      </li>
+      <li className="mr-2">
+        <Link
+          href="/players"
+          className={`inline-block py-2 px-4 rounded-t-lg ${
+            pathname === "/players"
+              ? "text-white bg-blue-500"
+              : "hover:text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          Players
+        </Link>
+      </li>
+      <li className="mr-2">
+        <Link
+          href="/teams"
+          className={`inline-block py-2 px-4 rounded-t-lg ${
+            pathname === "/teams"
+              ? "text-white bg-blue-500"
+              : "hover:text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          Teams
+        </Link>
+      </li>
+      <li className="mr-2">
+        <Link
+          href="/builder"
+          className={`inline-block py-2 px-4 rounded-t-lg ${
+            pathname === "/builder"
+              ? "text-white bg-blue-500"
+              : "hover:text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          Team Builder
+        </Link>
+      </li>
+    </ul>
   );
 }

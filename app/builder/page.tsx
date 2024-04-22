@@ -350,7 +350,7 @@ export default function BuilderSection() {
   return (
     <div>
       <div className="flex justify-center">
-        <div className="stat-section p-5 flex flex-col ">
+        <div className="stat-section flex flex-col ">
           <div className="flex justify-center p-3 text-lg text-slate-950">
             Stats Table
           </div>
@@ -410,6 +410,8 @@ export default function BuilderSection() {
                         src="/close-button.svg"
                         alt=""
                         onClick={() => removeStat(stat.id)}
+                        height={20}
+                        width={20}
                       />
                     </td>
                   </tr>
@@ -432,7 +434,7 @@ export default function BuilderSection() {
             </button>
           </div>
         </div>
-        <div className="built-team-section p-5 flex flex-col gap-4 justify-center items-center">
+        <div className="built-team-section pl-8 pt-2 flex flex-col gap-2 justify-center items-center">
           <div className="search-bar flex justify-center ">
             <div className="search">
               <div className="search-inputs flex border-2 justify-between rounded border-slate-300">
@@ -449,13 +451,21 @@ export default function BuilderSection() {
                 ></input>
                 <div className="search-icon h-6 w-12 bg-white grid place-items-center focus:outline-none">
                   {filteredData.length == 0 ? (
-                    <Image className="h-5" src="/search-52.svg" alt="" />
+                    <Image
+                      className="h-5"
+                      src="/search-52.svg"
+                      alt=""
+                      height={20}
+                      width={20}
+                    />
                   ) : (
                     <Image
                       className="h-5 cursor-pointer"
                       src="/icons8-close.svg"
                       alt=""
                       onClick={clearInput}
+                      height={20}
+                      width={20}
                     />
                   )}
                 </div>
@@ -472,13 +482,15 @@ export default function BuilderSection() {
                           {player.first_name + " " + player.second_name}
                         </div>
                         <Image
-                          className="h-8 cursor-pointer"
+                          className="h-8 cursor-pointer mr-2"
                           src="/icons8-plus.svg"
                           alt=""
                           onClick={() => {
                             addToTeam(player);
                             clearInput();
                           }}
+                          height={20}
+                          width={20}
                         />
                       </div>
                     );
@@ -589,47 +601,3 @@ export default function BuilderSection() {
     </div>
   );
 }
-
-// <div className="team-tables">
-//           {Object.entries(team).map(([position, players], index) => (
-//             <div key={position} className="team-table mb-4">
-//               <h3 className="text-lg font-bold text-center">{position}</h3>
-//               <table className="table-auto w-full">
-//                 <thead>
-//                   <tr className="bg-gray-200">
-//                     <th className="px-4 py-2">Player Name</th>
-//                     <th className="px-4 py-2">Position Rank</th>
-//                     <th className="px-4 py-2">Total Rank</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {isLoading ? (
-//                     <div>Loading team...</div>
-//                   ) : (
-//                     players.map((player: any, index) => (
-//                       <tr key={index} className={player ? "bg-green-100" : ""}>
-//                         <td className="border px-4 py-2 text-center">
-//                           {player
-//                             ? `${player.first_name} ${player.second_name}`
-//                             : ""}
-//                         </td>
-//                         <td className="border px-4 py-2 text-center">...</td>{" "}
-//                         {/* Your other cells */}
-//                         <td className="border px-4 py-2 text-center">
-//                           {player && (
-//                             <button
-//                               onClick={() => removeFromTeam(player)}
-//                               className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-//                             >
-//                               Remove
-//                             </button>
-//                           )}
-//                         </td>
-//                       </tr>
-//                     ))
-//                   )}
-//                 </tbody>
-//               </table>
-//             </div>
-//           ))}
-//         </div>

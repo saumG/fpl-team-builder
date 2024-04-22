@@ -3,10 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 export const metadata = {
-  metadataBase: new URL("https://google.com"),
-  title: "Vercel Postgres Demo with Kysely",
+  title: "Fantasy Premier League Team Builder",
   description:
-    "A simple Next.js app with Vercel Postgres as the database and Kysely as the ORM",
+    "Create your optimal fantasy team based on real-life player stats and performance metrics.",
 };
 
 const inter = Inter({

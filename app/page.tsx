@@ -1,5 +1,3 @@
-import ExpandingArrow from "@/components/expanding-arrow";
-import Image from "next/image";
 import Link from "next/link";
 
 export const preferredRegion = "home";
@@ -24,3 +22,10 @@ export default function Home() {
     </main>
   );
 }
+
+// <Link
+//   href="/builder"
+//   className="mt-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+// >
+//   Go to Team Builder
+// </Link>
