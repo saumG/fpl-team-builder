@@ -7,8 +7,8 @@ export default function Header() {
   const pathname = usePathname();
 
   return (
-    <ul className="p-2 flex flex-wrap justify-center text-sm font-medium text-center text-gray-500 border-b border-gray-200">
-      <li className="mr-2">
+    <ul className="p-2 flex flex-wrap justify-center text-sm font-medium text-center text-gray-500 border-b border-[#22354C] ">
+      <li className="mr-8">
         <Link
           href="/"
           className={`inline-block py-2 px-4 rounded-t-lg ${
@@ -20,7 +20,7 @@ export default function Header() {
           Home
         </Link>
       </li>
-      <li className="mr-2">
+      <li className="mr-8">
         <Link
           href="/players"
           className={`inline-block py-2 px-4 rounded-t-lg ${
@@ -32,7 +32,7 @@ export default function Header() {
           Players
         </Link>
       </li>
-      <li className="mr-2">
+      <li className="mr-8">
         <Link
           href="/teams"
           className={`inline-block py-2 px-4 rounded-t-lg ${
@@ -42,18 +42,6 @@ export default function Header() {
           }`}
         >
           Teams
-        </Link>
-      </li>
-      <li className="mr-2">
-        <Link
-          href="/builder"
-          className={`inline-block py-2 px-4 rounded-t-lg ${
-            pathname === "/builder"
-              ? "text-white bg-blue-500"
-              : "hover:text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          Team Builder
         </Link>
       </li>
     </ul>

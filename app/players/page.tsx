@@ -30,7 +30,7 @@ export default function PlayerSection() {
   }, []);
 
   return (
-    <div>
+    <div className="mx-36 max-h-screen">
       <InputText
         onInput={(e: any) =>
           setFilters({

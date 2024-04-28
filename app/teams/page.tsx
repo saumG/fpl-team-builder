@@ -41,7 +41,7 @@ export default function TeamSection() {
   };
 
   return (
-    <div>
+    <div className="mx-36 max-h-screen">
       <InputText
         onInput={(e: any) => {
           handleChange(e);
