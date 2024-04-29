@@ -41,8 +41,9 @@ export default function TeamSection() {
   };
 
   return (
-    <div className="mx-36 max-h-screen">
+    <div className="mx-36 mb-8">
       <InputText
+        className="m-4 w-96"
         onInput={(e: any) => {
           handleChange(e);
         }}
@@ -54,6 +55,8 @@ export default function TeamSection() {
         filters={filters}
         paginator
         rows={20}
+        size="small"
+        stripedRows
       >
         <Column sortable field="name" header="Team"></Column>
         <Column sortable field="short_name" header="Abbv"></Column>

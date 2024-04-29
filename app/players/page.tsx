@@ -30,8 +30,9 @@ export default function PlayerSection() {
   }, []);
 
   return (
-    <div className="mx-36 max-h-screen">
+    <div className="mx-36 mb-8">
       <InputText
+        className="m-4 w-96"
         onInput={(e: any) =>
           setFilters({
             global: {
@@ -48,6 +49,8 @@ export default function PlayerSection() {
         paginator
         rows={10}
         rowsPerPageOptions={[10, 25, 50]}
+        size="small"
+        stripedRows
       >
         <Column sortable field="first_name" header="First Name"></Column>
         <Column sortable field="second_name" header="Second Name"></Column>
