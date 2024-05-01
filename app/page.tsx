@@ -349,15 +349,12 @@ export default function BuilderSection() {
                 Fantasy Premier League Team Builder
                 <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
                   Clicking
-                  <span className="text-green-500">"Calculate Best Team"</span>
+                  <span className="text-green-500">
+                    {' "Calculate Best Team" '}
+                  </span>
                   will use the stats and their weights from the table below to
                   generate the highest scoring FPL team within £100m.
                 </p>
-                {/* <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Clicking "Calculate Best Team" will calculate scores based on
-                  the stats and weights provided and generate the best scoring
-                  15 player Fantasy Premier League team.
-                </p> */}
               </caption>
               <thead className="text-xs text-[#CBD5E1] uppercase">
                 <tr className="">
