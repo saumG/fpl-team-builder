@@ -340,16 +340,18 @@ export default function BuilderSection() {
   };
 
   return (
-    <div className="max-h-screen">
+    <div className="max-h-[100vh - 36px] ">
       <div className="flex justify-center">
         <div className="stat-section flex flex-col ">
           <div className="stat-table overflow-x-auto">
             <table className="w-full text-sm text-left rtl:text-right text-[#37BDF8]">
               <caption className="p-5 text-lg font-semibold text-left rtl:text-right text-white bg-[rgb(30,41,59)] my-2">
-                Stat Weights Selector
+                Fantasy Premier League Team Builder
                 <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Browse and select from a list of player stats, then assign
-                  weights for each stats.
+                  Clicking{" "}
+                  <span className="text-green-500">"Calculate Best Team"</span>{" "}
+                  will use the stats and their weights from the table below to
+                  generate the highest scoring FPL team within £100m.
                 </p>
                 {/* <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
                   Clicking "Calculate Best Team" will calculate scores based on
@@ -447,11 +449,11 @@ export default function BuilderSection() {
         <div className="built-team-section pl-8 pt-2 flex flex-col gap-2 justify-center items-center">
           <div className="search-bar flex justify-center ">
             <div className="search">
-              <div className="search-inputs flex border-2 justify-between rounded border-slate-300">
+              <div className="search-inputs flex border-4 border-[#193854] justify-between rounded">
                 <input
-                  className="bg-white rounded text-base text-black p-2 h-6 w-96 border-none"
+                  className="bg-[#121212] text-[#E2E8F0] p-2 h-6 w-96 border-none"
                   type="text"
-                  placeholder="Enter a player's name..."
+                  placeholder="Search for a player to add to your team..."
                   onChange={handleFilter}
                   value={wordEntry}
                   onFocus={() => setIsInputFocused(true)}
@@ -459,7 +461,7 @@ export default function BuilderSection() {
                     setTimeout(() => setIsInputFocused(false), 250); // delays state update
                   }}
                 ></input>
-                <div className="search-icon h-6 w-12 bg-white grid place-items-center focus:outline-none">
+                <div className="search-icon h-6 w-12 bg-[#193854] grid place-items-center focus:outline-none">
                   {filteredData.length == 0 ? (
                     <Image
                       className="h-5"
@@ -470,7 +472,7 @@ export default function BuilderSection() {
                     />
                   ) : (
                     <Image
-                      className="h-5 cursor-pointer"
+                      className="h-5 cursor-pointer "
                       src="/icons8-close.svg"
                       alt=""
                       onClick={clearInput}
@@ -481,14 +483,14 @@ export default function BuilderSection() {
                 </div>
               </div>
               {isInputFocused && filteredData.length != 0 && (
-                <div className="search-result mt-[5px] w-96 max-h-60  bg-white shadow-[rgba(0,0,0,0.35) 0px 5px 15px] overflow-hidden overflow-y-auto no-scrollbar absolute z-50 border-2 border-slate-400">
+                <div className="search-result mt-[5px] w-96 max-h-60  bg-[#1E293B] shadow-[rgba(0,0,0,0.35) 0px 5px 15px] overflow-hidden overflow-y-auto no-scrollbar absolute z-50 ">
                   {filteredData.slice(0, 15).map((player: any) => {
                     return (
                       <div
                         key={player.id}
-                        className="flex justify-between w-96  hover:bg-gray-200 px-2 py-2"
+                        className="flex justify-between w-96 text-[#CBD5E1] hover:bg-gray-200 hover:text-black px-2 py-2"
                       >
-                        <div className="data-item player flex items-center text-black ml-2">
+                        <div className="data-item player flex items-center ml-2">
                           {player.first_name + " " + player.second_name}
                         </div>
                         <Image
@@ -499,8 +501,8 @@ export default function BuilderSection() {
                             addToTeam(player);
                             clearInput();
                           }}
-                          height={20}
-                          width={20}
+                          height={30}
+                          width={30}
                         />
                       </div>
                     );
@@ -536,11 +538,11 @@ export default function BuilderSection() {
                           X
                         </button>
                       </div>
-                      <div className="flex flex-col items-center justify-center text-[10px] basis-5/6 bg-blue-600 rounded-2xl text-white py-2">
+                      <div className="flex flex-col items-center justify-center text-[10px] basis-5/6 bg-gradient-to-b from-[#18A2E9] to-[#6268F1] rounded-2xl text-white py-2">
                         <div>{player.first_name}</div>
                         <div> {player.second_name}</div>
                       </div>
-                      <div className="text-[10px] basis-1/6 flex items-center justify-around bg-blue-300 rounded-2xl ">
+                      <div className="text-[10px] basis-1/6 flex items-center justify-around bg-gradient-to-r from-[#E9499C] to-[#8E5BF5] rounded-2xl ">
                         <div>TR: {player.total_rank ?? "N/A"}</div>
                         <div>PR: {player.position_rank ?? "N/A"}</div>
                       </div>

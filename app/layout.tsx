@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="bg-gradient-to-t from-[rgb(15,23,42)] from-60% to-[#182b45] to-100%"
+      className="bg-gradient-to-tr from-[rgb(15,23,42)] from-40% to-[#182b45] to-60%%"
     >
       <body className={inter.variable}>
         <Header />

@@ -7,7 +7,7 @@ export default function Header() {
   const pathname = usePathname();
 
   return (
-    <ul className="p-2 flex flex-wrap justify-center text-sm font-medium text-center text-gray-500 border-b border-[#22354C] ">
+    <ul className="p-2 flex flex-wrap justify-center text-sm font-medium text-center text-[#CBD5E1] border-b border-[#22354C]">
       <li className="mr-8">
         <Link
           href="/"
